@@ -43,6 +43,10 @@ dependencies:
   pinput: ^2.2.23
   shared_preferences: ^2.0.15
   fluttertoast: ^8.0.9
+  on_audio_query: ^2.6.1
+  permission_handler: ^10.2.0
+  video_player: ^2.5.1
+
 
 dev_dependencies:
   flutter_test:

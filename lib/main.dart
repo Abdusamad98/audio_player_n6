@@ -1,11 +1,14 @@
-
 import 'package:audio_player_n6/data/storage.dart';
+import 'package:audio_player_n6/ui/audio/audio_screen.dart';
 import 'package:audio_player_n6/ui/local_auth/bloc/local_auth_bloc.dart';
 import 'package:audio_player_n6/ui/local_auth/pin_code_screen.dart';
 import 'package:audio_player_n6/ui/local_auth/set_pin_code.dart';
+import 'package:audio_player_n6/ui/video/video_screen.dart';
+import 'package:audio_player_n6/ui/video/videos_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:video_player/video_player.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +31,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SplashScreen(),
+      home: VideosScreen(),
     );
   }
 }

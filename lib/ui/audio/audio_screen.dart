@@ -1,6 +1,8 @@
+import 'package:audio_player_n6/ui/audio/all_audios_screen.dart';
 import 'package:audio_player_n6/ui/audio/widgets/volume_changer.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AudioScreen extends StatefulWidget {
   const AudioScreen({Key? key}) : super(key: key);
@@ -23,7 +25,8 @@ class _AudioScreenState extends State<AudioScreen> {
 
   @override
   void initState() {
-    _init();
+    //_init();
+    _getStoragePermission();
     super.initState();
   }
 
@@ -43,10 +46,14 @@ class _AudioScreenState extends State<AudioScreen> {
 
     player.onPlayerComplete.listen((event) {
       isPlaying = false;
-       duration = Duration.zero;
-       currentDuration = Duration.zero;
+      duration = Duration.zero;
+      currentDuration = Duration.zero;
       setState(() {});
     });
+  }
+
+  _getStoragePermission() async {
+    await Permission.storage.request();
   }
 
   @override
@@ -133,6 +140,25 @@ class _AudioScreenState extends State<AudioScreen> {
                 });
               },
             ),
+            ElevatedButton(
+                onPressed: () async {
+                  var storagePerStatus = await Permission.storage.isGranted;
+                  if (!mounted) return;
+                  print("STORAGE PERMISSON:$storagePerStatus");
+                  if (storagePerStatus) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return AllAudiosScreen();
+                        },
+                      ),
+                    );
+                  }else{
+                    Permission.storage.request();
+                  }
+                },
+                child: Text("Get All Songs"))
           ],
         )),
       ),
