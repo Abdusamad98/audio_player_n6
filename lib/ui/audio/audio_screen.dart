@@ -12,7 +12,10 @@ class AudioScreen extends StatefulWidget {
 }
 
 class _AudioScreenState extends State<AudioScreen> {
+
   final AudioPlayer player = AudioPlayer();
+
+  String url = "";
 
   double _currentSliderValue = 0.2;
 
@@ -26,12 +29,12 @@ class _AudioScreenState extends State<AudioScreen> {
   @override
   void initState() {
     //_init();
-    _getStoragePermission();
     super.initState();
   }
 
   _init() async {
-    await player.setSource(AssetSource("mp3/mozart.mp3"));
+    //  await player.setSource(AssetSource("mp3/mozart.mp3"));
+    await player.setSourceUrl(url);
     player.onDurationChanged.listen((Duration d) {
       setState(() {
         duration = d;
@@ -53,7 +56,16 @@ class _AudioScreenState extends State<AudioScreen> {
   }
 
   _getStoragePermission() async {
-    await Permission.storage.request();
+    var storageStatus = await Permission.storage.status;
+    var phoneStatus = await Permission.phone.status;
+    if (storageStatus == PermissionStatus.denied ||
+        phoneStatus == PermissionStatus.denied) {
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.storage,
+        Permission.phone,
+      ].request();
+      print("MULTI PERMISSIONS STATUSES:$statuses");
+    }
   }
 
   @override
@@ -74,7 +86,7 @@ class _AudioScreenState extends State<AudioScreen> {
                     if (isPlaying) {
                       player.pause();
                     } else {
-                      await player.play(AssetSource("mp3/mozart.mp3"));
+                      await player.play(DeviceFileSource(url));
                     }
                     isPlaying = !isPlaying;
                     setState(() {});
@@ -142,20 +154,26 @@ class _AudioScreenState extends State<AudioScreen> {
             ),
             ElevatedButton(
                 onPressed: () async {
+                  _getStoragePermission();
                   var storagePerStatus = await Permission.storage.isGranted;
                   if (!mounted) return;
                   print("STORAGE PERMISSON:$storagePerStatus");
                   if (storagePerStatus) {
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return AllAudiosScreen();
+                          return AllAudiosScreen(
+                            onMusicChosen: (uri) {
+                              url = uri;
+                              _init();
+                            },
+                          );
                         },
                       ),
                     );
-                  }else{
-                    Permission.storage.request();
+                  } else {
+                    _getStoragePermission();
                   }
                 },
                 child: Text("Get All Songs"))

@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
-class AllAudiosScreen extends StatefulWidget {
-  const AllAudiosScreen({Key? key}) : super(key: key);
+class AllAudiosScreen extends StatelessWidget {
+  const AllAudiosScreen({Key? key, required this.onMusicChosen})
+      : super(key: key);
 
-  @override
-  State<AllAudiosScreen> createState() => _AllAudiosScreenState();
-}
-
-class _AllAudiosScreenState extends State<AllAudiosScreen> {
-  final OnAudioQuery _audioQuery = OnAudioQuery();
+  final ValueChanged<String> onMusicChosen;
 
   @override
   Widget build(BuildContext context) {
+    final OnAudioQuery _audioQuery = OnAudioQuery();
     return Scaffold(
       appBar: AppBar(
         title: const Text('All Audios screen'),
@@ -27,6 +24,22 @@ class _AllAudiosScreenState extends State<AllAudiosScreen> {
                     var item = snapshot.data![index];
                     return ListTile(
                       title: Text(item.title),
+                      onTap: () {
+                        print('''
+                        TITLE:  ${item.title},
+                        DATA:  ${item.data},
+                        ID:  ${item.id},
+                        ALBUM:  ${item.album},
+                        URI:  ${item.uri},
+                        SIZE:  ${item.size},
+                        ARTIST:  ${item.artist},
+                        displayName:  ${item.displayName},
+                        genre:  ${item.genre},
+                        isMusic:  ${item.isMusic},
+                          ''');
+                        onMusicChosen.call(item.data);
+                        Navigator.pop(context);
+                      },
                     );
                   })
                 ],
