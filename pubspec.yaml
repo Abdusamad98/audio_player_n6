@@ -39,13 +39,14 @@ dependencies:
   equatable: ^2.0.5
   url_launcher: ^6.1.8
   telephony: ^0.2.0
-  audioplayers: ^3.0.1
-  pinput: ^2.2.23
+  audioplayers: ^6.0.0
+  pinput: ^4.0.0
   shared_preferences: ^2.0.15
   fluttertoast: ^8.0.9
   on_audio_query: ^2.6.1
-  permission_handler: ^10.2.0
+  permission_handler: ^11.3.1
   video_player: ^2.5.1
+  device_info_plus: ^10.1.0
 
 
 dev_dependencies:
@@ -53,7 +54,7 @@ dev_dependencies:
     sdk: flutter
 
 
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
 
 
 

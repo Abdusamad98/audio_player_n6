@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:audio_player_n6/ui/audio/all_audios_screen.dart';
 import 'package:audio_player_n6/ui/audio/widgets/volume_changer.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class AudioScreen extends StatefulWidget {
@@ -12,8 +16,9 @@ class AudioScreen extends StatefulWidget {
 }
 
 class _AudioScreenState extends State<AudioScreen> {
-
   final AudioPlayer player = AudioPlayer();
+
+  bool _hasPermission = false;
 
   String url = "";
 
@@ -26,6 +31,8 @@ class _AudioScreenState extends State<AudioScreen> {
   Duration duration = Duration.zero;
   Duration currentDuration = Duration.zero;
 
+  final OnAudioQuery _audioQuery = OnAudioQuery();
+
   @override
   void initState() {
     //_init();
@@ -33,8 +40,7 @@ class _AudioScreenState extends State<AudioScreen> {
   }
 
   _init() async {
-    //  await player.setSource(AssetSource("mp3/mozart.mp3"));
-    await player.setSourceUrl(url);
+    await player.setSource(DeviceFileSource(url));
     player.onDurationChanged.listen((Duration d) {
       setState(() {
         duration = d;
@@ -55,17 +61,22 @@ class _AudioScreenState extends State<AudioScreen> {
     });
   }
 
-  _getStoragePermission() async {
-    var storageStatus = await Permission.storage.status;
-    var phoneStatus = await Permission.phone.status;
-    if (storageStatus == PermissionStatus.denied ||
-        phoneStatus == PermissionStatus.denied) {
-      Map<Permission, PermissionStatus> statuses = await [
-        Permission.storage,
-        Permission.phone,
-      ].request();
-      print("MULTI PERMISSIONS STATUSES:$statuses");
+  _getStoragePermission({bool retry = false}) async {
+    final info = await DeviceInfoPlugin().androidInfo;
+    if (Platform.isAndroid && info.version.sdkInt > 29) {
+      await Permission.manageExternalStorage.request();
+    } else {
+      await Permission.storage.request();
     }
+    // The param 'retryRequest' is false, by default.
+    _hasPermission = await _audioQuery.checkAndRequest(
+      retryRequest: retry,
+    );
+
+    // Only call update the UI if application has all required permissions.
+    _hasPermission ? setState(() {}) : null;
+
+    return await Permission.storage.request().isGranted;
   }
 
   @override
@@ -155,7 +166,8 @@ class _AudioScreenState extends State<AudioScreen> {
             ElevatedButton(
                 onPressed: () async {
                   _getStoragePermission();
-                  var storagePerStatus = await Permission.storage.isGranted;
+                  var storagePerStatus = await Permission.storage.isGranted ||
+                      await Permission.manageExternalStorage.isGranted;
                   if (!mounted) return;
                   print("STORAGE PERMISSON:$storagePerStatus");
                   if (storagePerStatus) {
