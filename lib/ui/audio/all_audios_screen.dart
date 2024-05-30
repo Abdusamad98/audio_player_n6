@@ -10,6 +10,7 @@ class AllAudiosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OnAudioQuery _audioQuery = OnAudioQuery();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('All Audios screen'),
@@ -24,6 +25,10 @@ class AllAudiosScreen extends StatelessWidget {
                     var item = snapshot.data![index];
                     return ListTile(
                       title: Text(item.title),
+                      trailing: QueryArtworkWidget(
+                        id: item.id,
+                        type: ArtworkType.ARTIST,
+                      ),
                       onTap: () {
                         print('''
                         TITLE:  ${item.title},
